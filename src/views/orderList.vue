@@ -243,7 +243,7 @@
 		font-size: 13px;
 		color: #6C7F85;
 	}
-	.table_box table tbody tr td .Enter{
+	.Enter{
 		display: inline-block;
 		width: 80px;
 		height: 26px;
@@ -274,15 +274,31 @@
 	}
 </style>
 <style>
+	.el-table th, .el-table tr{
+		height: 45px !important;
+	}
+	.el-table td, .el-table th.is-leaf{
+		padding: 9px 0 !important;
+	}
 	.el-input__inner{
 		height: 35px !important;
 		line-height: 35px !important;
+	}
+	.el-button--mini, .el-button--mini.is-round{
+		width: 80px;
+		height: 26px;
+		background: #3BC1C4 !important;
+		color: #fff !important;
+		border-radius: 3px;
+	}
+	.el-button{
+		line-height: 0 !important;
 	}
 </style>
 <template>
 	<div class="orderList">
 		<div class="o_left">
-			<h1>失联修复管理平台</h1>
+			<h1><img src="../assets/img/logo.png" alt=""></h1>
 			<ul>
 				<li><span><img src="../assets/img/icon_nav_sldhgl@2x.png" alt=""></span>失联电话管理</li>
 			</ul>
@@ -292,15 +308,15 @@
 			<div class="bottom">
 				<div class='div_box'>
 					<p>月话单统计</p>
-					<div class="block">
+					<div class="block" style="display: none;">
 						<el-date-picker v-model="value5" align="right" type="year" placeholder="选择年">
 						</el-date-picker>
 					</div>
 					<div class="block">
-						<el-date-picker v-model="value4" type="month" placeholder="选择月">
+						<el-date-picker value-format="yyyy-MM" v-model="value4" type="month" placeholder="选择月">
 						</el-date-picker>
 					</div>
-					<p style='width:35px;height:35px;min-width:35px'><button>GO</button></p>
+					<p style='width:35px;height:35px;min-width:35px'><button @click="listAjax()">GO</button></p>
 					<p class="daochu">导出报表</p>
 					<h2 style="width: 100%;font-size: 14px;color: #6C7F85;text-align: right;line-height: 35px;">失联修复主号码：011—5653531</h2>
 				</div>
@@ -308,18 +324,18 @@
 					<div class="mod_box">
 						<div class="box1">
 							<h3>电话总数量</h3>
-							<h1>5630 <span>个</span></h1>
+							<h1>{{PhoneNum}} <span>个</span></h1>
 						</div>
 						<div class="box2">
 							<h3>已拨打修复电话</h3>
-							<h1>560 <span>个</span></h1>
+							<h1>{{DialedNum}} <span>个</span></h1>
 						</div>
 						<div class="box3">
 							<h3>剩余可联系号码</h3>
-							<h1>530 <span>个</span></h1>
+							<h1>{{SurplusNum}} <span>个</span></h1>
 						</div>
 						<div class="box4">
-							<p>新建失联修复电话单</p>
+							<p @click="$router.push({path:'/newPhone'})">新建失联修复电话单</p>
 						</div>
 					</div>
 					<div class="table_box">
@@ -327,156 +343,31 @@
 							<img src="../assets/img/pic_empty.png" alt="">
 							<p>暂无失联电话名单，</br>请新建失联修复电话单</p>
 						</div>
-						<table>
-							<thead>
-								<tr>
-									<th>电话单</th>
-									<th>激活时间</th>
-									<th>修复电话数</th>
-									<th>已拨打</th>
-									<th>剩余次数</th>
-									<th>有效期</th>
-									<th>立即联系</th>
-								</tr>
-							</thead>
-							<tbody class='tbody'>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit">审核中</span>
-										<a class="Enter " href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit">审核中</span>
-										<a class="Enter " href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit">审核中</span>
-										<a class="Enter " href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit">审核中</span>
-										<a class="Enter " href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit">审核中</span>
-										<a class="Enter " href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit">审核中</span>
-										<a class="Enter " href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit">审核中</span>
-										<a class="Enter " href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit" v-if="iSfalse">审核中</span>
-										<a class="Enter " v-else href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit" v-if="iSfalse">审核中</span>
-										<a class="Enter " v-else href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit" v-if="iSfalse">审核中</span>
-										<a class="Enter " v-else href="javascript:">进入</a>
-									</td>
-								</tr>
-								<tr>
-									<td>第一批失联电话</td>
-									<td>2018-02-05</td>
-									<td>30</td>
-									<td>2</td>
-									<td>12</td>
-									<td>2018-02-05</td>
-									<td>
-										<span class="audit" v-if="iSfalse">审核中</span>
-										<a class="Enter " v-else href="javascript:">进入</a>
-									</td>
-								</tr>
-							</tbody>
-						</table>
+						<el-table v-show='isTab' :data="tableData.slice((currpage - 1) * pagesize, currpage * pagesize)" height="100%" align='center'
+						 style="width: 100%;">
+							<el-table-column align='center' width='100' prop="TelephoneCollectiveName" label="电话单">
+							</el-table-column>
+							<el-table-column align='center' prop="ActivationTime" label="激活时间">
+							</el-table-column>
+							<el-table-column align='center' prop="RepairNum" label="修复电话数">
+							</el-table-column>
+							<el-table-column align='center' prop="DialedNum" label="已拨打">
+							</el-table-column>
+							<el-table-column align='center' prop="ResidualNum" label="剩余次数">
+							</el-table-column>
+							<el-table-column align='center' prop="ValidityTime" label="有效期">
+							</el-table-column>
+							<el-table-column align='center' label="立即联系">
+								<template slot-scope="scope">
+									<el-button v-if='scope.row.status == 1' size="mini" @click="editor(scope.row)">进入</el-button>
+									<span v-else style="color:#6C7F85;">审核中</span>
+								</template>
+							</el-table-column>
+						</el-table>
 
 					</div>
-					<el-pagination background layout="prev, pager, next" :total="1000">
+					<el-pagination v-show="isTab" @size-change='handleSizeChange' @current-change='handleCurrentChange' :page-size='pagesize'
+					 background layout="prev, pager, next" :total="tableData.length">
 					</el-pagination>
 				</div>
 			</div>
@@ -488,20 +379,76 @@
 	import headAccount from '../components/headAccount.vue'
 	export default {
 		name: 'orderList',
-		components:{
+		components: {
 			headAccount
 		},
 		data() {
 			return {
+				pagesize: 8,
+				currpage: 1,
 				value4: '',
 				value5: '',
 				iSfalse: false,
-				nullTrue:false,
-				pagesize:8
+				nullTrue: false,
+				url: this.URL.url,
+				tableData: [],
+				PhoneNum: '',
+				DialedNum: '',
+				SurplusNum: '',
+				isTab:false
 			}
 		},
-		mounted(){
+		mounted() {
+			this.listAjax()
+		},
+		updated(){
 			
+		},
+		methods: {
+			
+			editor(row) {
+				this.$router.push({
+					path:'/callDetails',
+					query:{
+						id:row.id
+					}
+				})
+			},
+			handleSizeChange(val) {
+				// console.log('每页+"val"+条')
+				this.pagesize = val
+			},
+			handleCurrentChange(val) {
+				// console.log('当前页'+ val)
+				this.currpage = val
+			},
+			listAjax() {
+				this.$axios({
+					method: 'post',
+					url: this.url + '/api/Missingrepair/MonthCollect',
+					data: {
+						YearMonth: this.value4
+					},
+					
+				}).then((res) => {
+					if (res.data.code == 200) {
+						this.tableData = res.data.data
+						
+						this.nullTrue = false
+						this.isTab = true
+						this.PhoneNum = res.data.PhoneNum
+						this.DialedNum = res.data.DialedNum
+						this.SurplusNum = res.data.SurplusNum
+						this.value4 = res.data.YearMonth
+					} else if (res.data.code == 40011) {
+						this.$message.error('非法操作');
+					} else if (res.data.code == 202) {
+						this.nullTrue = true
+						this.isTab = false
+
+					}
+				})
+			},
 		}
 	}
 </script>

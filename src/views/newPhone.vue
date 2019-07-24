@@ -217,9 +217,10 @@
 		margin-left: 6px;
 		margin-right: 10px;
 	}
-	.content .top_box .flex1 p button{
+	.content .top_box .flex1 p button,.btn_span{
 		width: 110px;
 		height: 35px;
+		line-height: 35px;
 		border: 0;
 		background: #4DBD73;
 		border-radius: 3px;
@@ -227,6 +228,18 @@
 		color: #FFFFFF;
 		text-align: center;
 		margin-left: 20px;
+		display: inline-block;
+	}
+	.content .top_box .flex1 p .btn_span{
+		position: relative;
+	}
+	.content .top_box .flex1 p .btn_span input[type=file]{
+		width: 110px;
+		height: 35px;
+		position: absolute;
+		left: 0;
+		margin-left: 0;
+		opacity: 0;
 	}
 	.content .top_box .flex1 p a{
 		color: rgb(62,117,234);
@@ -465,7 +478,7 @@
 <template>
 	<div class="newPhone">
 		<div class="o_left">
-			<h1>失联修复管理平台</h1>
+			<h1><img src="../assets/img/logo.png" alt=""></h1>
 			<ul>
 				<li><span><img src="../assets/img/icon_nav_sldhgl@2x.png" alt=""></span>失联电话管理</li>
 			</ul>
@@ -474,8 +487,7 @@
 			<head-account></head-account>
 			<div class="bottom">
 				<div class='div_box'>
-					<p style='width:35px;height:35px;min-width:35px'><button style="background: #828DA3;"><img style="vertical-align: middle;"
-							 src="../assets/img/icon_back.png" alt=""></button></p>
+					<p style='width:35px;height:35px;min-width:35px'><button @click="$router.push({path:'/orderList'})" style="background: #828DA3;"><img style="vertical-align: middle;" src="../assets/img/icon_back.png" alt=""></button></p>
 					<p class="p_details">新建电话单</p>
 				</div>
 				<div class="content">
@@ -487,10 +499,8 @@
 						</div>
 						<div class="flex1">
 							<p>录入失联人名单</p>
-							<p><button @click="addTr()"><img style="vertical-align: sub;margin-right: 6px;margin-bottom: 1px;" src="../assets/img/icon_btn_add.png"
-									 alt="">添加</button><button style="background: #3BC1C4;"><img style="vertical-align: sub;margin-right: 6px;margin-bottom: 1px;" src="../assets/img/icon_btn_leadin.png"
-									 alt="">导入</button></p>
-							<p style="font-size: 13px;color: #828DA3;margin-left: 20px;">失联人名单必须按照Excel模板格式填写， <a href="javascript:">下载失联人名单Excel模板</a></p>
+							<p><button @click="addTr()"><img style="vertical-align: sub;margin-right: 6px;margin-bottom: 1px;" src="../assets/img/icon_btn_add.png" alt="">添加</button><span class="btn_span" style="background: #3BC1C4;"><img style="vertical-align: sub;margin-right: 6px;margin-bottom: 1px;" src="../assets/img/icon_btn_leadin.png" alt=""><input type="file" multiple="multiple" id='inputFile' @change="uploadFile($event)">导入</span></p>
+							<p style="font-size: 13px;color: #828DA3;margin-left: 20px;">失联人名单必须按照Excel模板格式填写， <a href="http://tapi.yzx360.com/upload/excel/Listofpersons.xls">下载失联人名单Excel模板</a></p>
 						</div>
 					</div>
 				</div>
@@ -499,14 +509,14 @@
 						<img src="../assets/img/pic_empty.png" alt="">
 						<p>暂无失联人名单，</br>请手动添加或导入名单</p>
 					</div>
-					<el-table :data="tableData3" height="340" align='center' style="width: 100%;">
+					<el-table v-show='isTab' :data="tableData3" height="340" align='center' style="width: 100%;">
 						<el-table-column align='center' width='100' type="index" label="序列号">
 						</el-table-column>
-						<el-table-column align='center' prop="name" label="姓名">
+						<el-table-column align='center' prop="RepairName" label="姓名">
 						</el-table-column>
-						<el-table-column align='center' prop="idCard" label="身份证号">
+						<el-table-column align='center' prop="RepairIdcard" label="身份证号">
 						</el-table-column>
-						<el-table-column align='center' prop="invalid" label="无效号码">
+						<el-table-column align='center' prop="FailPhone" label="无效号码">
 						</el-table-column>
 					</el-table>
 				</div>
@@ -536,7 +546,7 @@
 		</div>
 		<div class="submitAlert" v-show="isSubmit">
 			<h1>电话单成功提交申请，</br>请等待审核···</h1>
-			<button>我知道了</button>
+			<button @click="$router.push({path: '/orderList'})">我知道了</button>
 		</div>
 	</div>
 </template>
@@ -545,20 +555,20 @@
 	import headAccount from '../components/headAccount.vue'
 	export default {
 		name: 'newPhone',
-		components:{
+		components: {
 			headAccount
 		},
 		data() {
 			return {
-				phoneName:'',
+				phoneName: '',
 				iSfalse: false,
 				nullTrue: false,
-				iSaddAlert:false,
-				isSubmit:false,
-				isBlack:false,
-				addName:'',
-				addCard:'',
-				addInvalid:'',
+				iSaddAlert: false,
+				isSubmit: false,
+				isBlack: false,
+				addName: '',
+				addCard: '',
+				addInvalid: '',
 				options: [{
 					value: '选项1',
 					label: '黄金糕'
@@ -576,44 +586,97 @@
 					label: '北京烤鸭'
 				}],
 				value: '',
-				tableData3: [{
-					number: '1',
-					name: '王小虎',
-					idCard: '1306821989********',
-					invalid: '19766203418'
-				},{
-					number: '1',
-					name: '王小虎',
-					idCard: '1306821989********',
-					invalid: '19766203418'
-				}]
+				tableData3: [],
+				isTab: false,
+				url: this.URL.url,
+				file: '',
+				src: ''
 			}
 		},
-		mounted(){
-			
+		mounted() {
+			if (this.tableData3.length === 0) {
+				this.nullTrue = true
+				this.isTab = false
+			} else {
+				this.nullTrue = false
+				this.isTab = true
+			}
 		},
-		methods:{
-			addTr(){
+		methods: {
+			uploadFile(event) {
+				this.file = event.target.files[0]; //获取文件
+				var windowURL = window.URL || window.webkitURL;
+				this.file = event.target.files[0];
+				this.src = windowURL.createObjectURL(event.target.files[0]);
+				event.preventDefault(); //取消默认行为
+				let formdata = new window.FormData();
+				formdata.append('RepairersList', this.file);
+				this.$axios({
+					method: 'post',
+					url: this.url + '/api/Missingrepair/ExcelUpload',
+					data: formdata,
+					headers: {
+						'Content-Type': 'multipart/form-data' //之前说的以表单传数据的格式来传递fromdata
+					}
+				}).then((res) => {
+					if(res.data.code == 200){
+						console.log(res.data.data)
+						this.isTab = true
+						this.nullTrue = false
+						for(let i of res.data.data){
+							this.tableData3.push(i)
+						}
+						
+						
+					}
+					$('#inputFile').val('')
+				})
+			},
+			sub() {
+
+			},
+			addTr() {
 				this.isBlack = true
 				this.iSaddAlert = true
 			},
-			closeFun(){
+			closeFun() {
 				this.isBlack = false
 				this.iSaddAlert = false
 			},
-			addbtn(){
+			addbtn() {
 				this.tableData3.push({
-					name:this.addName,
-					idCard:this.addCard,
-					invalid:this.addInvalid
+					RepairName: this.addName,
+					RepairIdcard: this.addCard,
+					FailPhone: this.addInvalid
 				})
 				this.addName = ''
 				this.addCard = ''
 				this.addInvalid = ''
 				this.closeFun()
+				if (this.tableData3.length === 0) {
+					this.nullTrue = true
+					this.isTab = false
+				} else {
+					this.nullTrue = false
+					this.isTab = true
+				}
 			},
-			forSubmit(){
-				console.log(this.tableData3)
+			forSubmit() {
+				this.$axios({
+					method: 'post',
+					url: this.url + '/api/Missingrepair/PhoneCollectAdd',
+					data: {
+						TelephoneCollectiveName: this.phoneName,
+						params: this.tableData3
+					}
+				}).then((res) => {
+					if (res.data.code == 200) {
+						this.isSubmit = true
+						this.isBlack =  true
+					}else if (res.data.code == 201){
+						this.$message.error('请填写全部信息在提交');
+					}
+				})
 			}
 		}
 	}
@@ -622,9 +685,12 @@
 	.el-table thead tr th {
 		background: #E7E9EF;
 	}
-	.el-table td, .el-table th{
-		padding: 11px 0 !important;
+
+	.el-table td,
+	.el-table th {
+		padding: 9px 0 !important;
 	}
+
 	.el-table td,
 	.el-table th.is-leaf {
 		border-bottom: 0 !important;
@@ -638,6 +704,4 @@
 		background-color: #fff !important;
 		z-index: 1;
 	}
-
-	
 </style>

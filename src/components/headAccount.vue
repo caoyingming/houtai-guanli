@@ -1,25 +1,27 @@
 <template>
 	<div class="top">
 		<div class="set_box">
-			<div class="imgUrl"><img src="" alt=""></div>
-			<p style="margin: 0 23px 0 10px;">Amy Hall</p>
+			<div class="imgUrl"><img src="../assets/img/WechatIMG65.png" alt=""></div>
+			<p style="margin: 0 23px 0 10px;">{{name}}</p>
 			<div class="icon_set"><img src="../assets/img/icon_set@2x.png" alt=""></div>
 			<div class="exit" style="display: none;">
-				<p><span><img src="../assets/img/icon_exit@2x.png" alt=""></span>退出账号</p>
+				<p @click="clerLogin()"><span><img src="../assets/img/icon_exit@2x.png" alt=""></span>退出账号</p>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-	export default{
-		data(){
-			return{
-				
+	export default {
+		data() {
+			return {
+				name: '',
+				url: this.URL.url
 			}
 		},
-		mounted(){
-			$('.icon_set').on('click',function(e){
+		mounted() {
+			this.name = localStorage.getItem('sName')
+			$('.icon_set').on('click', function(e) {
 				$('.exit').slideDown()
 				$(document).one("click", function() {
 					$(".exit").slideUp();
@@ -27,8 +29,23 @@
 				e.stopPropagation()
 			})
 		},
-		methods:{
-			
+		methods: {
+			clerLogin() {
+				this.$axios({
+					method: 'post',
+					url: this.url + '/api/Admin/LoginOut',
+					headers: {
+						'authorization': localStorage.getItem("sToken")
+					},
+				}).then((res) => {
+					if (res.data.code == 200) {
+						localStorage.removeItem("sToken")
+						this.$router.push({
+							path: '/'
+						})
+					}
+				})
+			}
 		},
 	}
 </script>
@@ -42,38 +59,38 @@
 		padding-top: 5px;
 		box-sizing: border-box;
 	}
-	
-	 .top .set_box {
+
+	.top .set_box {
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
 		position: relative;
 	}
-	
-	 .top .set_box .imgUrl {
+
+	.top .set_box .imgUrl {
 		width: 30px;
 		height: 30px;
 		border-radius: 30px;
 		background: #ccc;
 	}
-	
-	 .top .set_box .imgUrl img {
+
+	.top .set_box .imgUrl img {
 		width: 100%;
 		height: 100%;
 		border-radius: 50%;
 	}
-	
-	 .top .set_box .icon_set {
+
+	.top .set_box .icon_set {
 		width: 20px;
 		height: 20px;
 	}
-	
-	 .top .set_box .icon_set img {
+
+	.top .set_box .icon_set img {
 		width: 100%;
 		height: 100%;
 	}
-	
-	 .top .set_box .exit {
+
+	.top .set_box .exit {
 		width: 150px;
 		height: 80px;
 		background: #fff;
@@ -83,22 +100,22 @@
 		right: 0;
 		top: 35px;
 	}
-	
-	 .top .set_box .exit p {
+
+	.top .set_box .exit p {
 		font-size: 14px;
 		color: #828DA3;
 		padding: 20px 0 0 18px;
 	}
-	
-	 .top .set_box .exit span {
+
+	.top .set_box .exit span {
 		display: inline-block;
 		width: 16px;
 		height: 16px;
 		vertical-align: sub;
 		margin-right: 5px;
 	}
-	
-	 .top .set_box .exit span img {
+
+	.top .set_box .exit span img {
 		width: 100%;
 		height: 100%;
 	}

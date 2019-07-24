@@ -149,12 +149,11 @@
 </style>
 <template>
 	<div id="login" class="login">
-		<h1>失联修复管理平台</h1>
+		<h1><img src="../assets/img/logo.png" alt=""></h1>
 		<div class="img1"><img src="../assets/img/pic_login1.png" alt=""></div>
 		<div class="img2"><img src="../assets/img/pic_login2.png" alt=""></div>
 		<div class="log_box">
 			<div style="padding: 0 30px;">
-			<div class="icon_right"><img src="../assets/img/icon_cancel@2x.png" alt=""></div>
 			<h2><img src="" alt=""><span><img style="width: 14px;height: 18px;vertical-align: sub;" src="../assets/img/icon_lock@2x.png"
 					 alt=""></span>登录·失联修复管理平台</h2>
 			<label>账号<span v-show="spanPrompt" style="color: #DF3A3A;font-size: 14px; float: right;">该账号不存在</span></label>
@@ -198,15 +197,43 @@
 			}
 		},
 		mounted() {
-			let account = localStorage.setItem("account",this.Account)
-			this.Account = account
+			this.Account = localStorage.getItem("account")
 		},
 		
 		methods: {
 			submitForm(){
-				if(this.checked == true){
-					localStorage.setItem("account",this.Account)
-				}
+				this.$axios({
+					method:'post',
+					url:this.url + '/api/Admin/Login',
+					data:{
+						name:this.Account,
+						psd:this.Password
+					}
+				}).then((res)=> {
+					if(res.data.code == 200){
+						localStorage.setItem('sToken',res.data.data.token)
+						localStorage.setItem('sName',res.data.data.name)
+						this.$router.push({
+							path:'/orderList'
+						})
+						if(this.checked == true){
+							localStorage.setItem("account",this.Account)
+						}else{
+							localStorage.removeItem("account")
+						}
+					}else if (res.data.code == 201){
+						this.$message.error('用户名和密码不能为空');
+					}else if(res.data.code = 202){
+						this.$message.error('登录失败请重新登录');
+					}else if(res.data.code = 40010){
+						this.$message.error('登录信息已过期');
+					}else if(res.data.code = 40011){
+						this.$message.error('非法操作');
+					}else if(res.data.code = 40001){
+						this.$message.error('没有此用户');
+					}
+				})
+				
 			},
 			eyes() {
 				if (this.imgShow) {

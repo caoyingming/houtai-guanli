@@ -328,7 +328,7 @@
 <template>
 	<div class="callDetails">
 		<div class="o_left">
-			<h1>失联修复管理平台</h1>
+			<h1><img src="../assets/img/logo.png" alt=""></h1>
 			<ul>
 				<li><span><img src="../assets/img/icon_nav_sldhgl@2x.png" alt=""></span>失联电话管理</li>
 			</ul>
@@ -337,33 +337,33 @@
 			<head-account></head-account>
 			<div class="bottom">
 				<div class='div_box'>
-					<p style='width:35px;height:35px;min-width:35px'><button style="background: #828DA3;"><img style="vertical-align: middle;"
-							 src="../assets/img/icon_back.png" alt=""></button></p>
+					<p style='width:35px;height:35px;min-width:35px'><button @click="$router.push({path:'/orderList'})" style="background: #828DA3;"><img
+							 style="vertical-align: middle;" src="../assets/img/icon_back.png" alt=""></button></p>
 					<p class="p_details">电话详情</p>
-					<el-select class='block' v-model="value" placeholder="第一批失联电话">
-						<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+					<el-select class='block' v-model="value" placeholder="第一批失联电话" @change='chChange'>
+						<el-option v-for="item in options" :key="item.id" :label="item.TelephoneCollectiveName" :value="item.id">
 						</el-option>
 					</el-select>
-					<p style='width:35px;height:35px;min-width:35px'><button>GO</button></p>
+					<p style='width:35px;height:35px;min-width:35px'><button @click="go()">GO</button></p>
 					<h2 style="width: 100%;font-size: 14px;color: #6C7F85;text-align: right;line-height: 35px;">失联修复主号码：011—5653531</h2>
 				</div>
 				<div class="content">
 					<div class="mod_box">
 						<div class="box1">
 							<h3>电话总数量</h3>
-							<h1>5630 <span>个</span></h1>
+							<h1>{{PhoneNum}} <span>个</span></h1>
 						</div>
 						<div class="box2">
 							<h3>已拨打修复电话</h3>
-							<h1>560 <span>个</span></h1>
+							<h1>{{DialedNum}} <span>个</span></h1>
 						</div>
 						<div class="box3">
 							<h3>剩余可联系号码</h3>
-							<h1>530 <span>个</span></h1>
+							<h1>{{SurplusNum}} <span>个</span></h1>
 						</div>
 						<div class="box4">
 							<h3>查询结果</h3>
-							<h1>8<span>个</span></h1>
+							<h1>{{NoNum}}<span>个</span></h1>
 						</div>
 					</div>
 					<div class="table_box">
@@ -371,49 +371,31 @@
 							<img src="../assets/img/pic_empty.png" alt="">
 							<p>暂无失联电话名单，</br>请新建失联修复电话单</p>
 						</div>
-						<el-table :data="tableData.slice((currpage - 1) * pagesize, currpage * pagesize)" style="width: 100%">
+						<el-table v-show="isTab" :data="tableData.slice((currpage - 1) * pagesize, currpage * pagesize)" style="width: 100%">
 							<el-table-column align='center' width='100' type="index" label="序列号">
 							</el-table-column>
-							<el-table-column align='center' width='100' prop="name" label="姓名">
+							<el-table-column align='center' width='100' prop="RepairName" label="姓名">
 							</el-table-column>
-							<el-table-column align='center' prop="idCard" label="身份证号">
+							<el-table-column align='center' prop="RepairIdcard" label="身份证号">
 							</el-table-column>
-							<el-table-column align='center' prop="phone" label="修复电话">
+							<el-table-column align='center' label="修复电话">
+								<template slot-scope="scope">
+									<span v-if='scope.row.RepairPhone == -99' style="color: red;">修复失败</span>
+									<span v-else-if='scope.row.RepairPhone == -2' style="color:red;">修复失败</span>
+									<span v-else-if='scope.row.RepairPhone == -1' style="color:red;">修复失败</span>
+									<span v-else style="color:#6C7F85;">{{scope.row.RepairPhone}}</span>
+								</template>
 							</el-table-column>
-							<el-table-column align='center' prop="yuoxiao" label="有效期">
+							<el-table-column align='center' prop="ValidityBegin" label="有效期">
 							</el-table-column>
-							<el-table-column align='center' width='250' prop="describe" label="描述">
+							<el-table-column align='center' width='250' prop="ValidityEnd" label="描述">
 							</el-table-column>
 						</el-table>
-						<!-- <table>
-							<thead>
-								<tr>
-									<th width="100">序号</th>
-									<th>姓名</th>
-									<th>身份证号</th>
-									<th>修复电话</th>
-									<th>有效期</th>
-									<th>描述</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td>张三</td>
-									<td>13082619890********</td>
-									<td>
-										<span>15622223333</span>
-										<span style="color: rgb(219,73,79);">修复失败</span>
-									</td>
-									<td>2019/10/16-2019/10/20</td>
-									<td>可拨打3次，每次拨打时长30分钟</td>
-								</tr>
-								
-							</tbody>
-						</table> -->
+
 
 					</div>
-					<el-pagination @size-change='handleSizeChange' @current-change='handleCurrentChange' :page-size='pagesize' background layout="prev, pager, next" :total="tableData.length">
+					<el-pagination v-show='isTab' @size-change='handleSizeChange' @current-change='handleCurrentChange' :page-size='pagesize'
+					 background layout="prev, pager, next" :total="tableData.length">
 					</el-pagination>
 				</div>
 			</div>
@@ -430,135 +412,101 @@
 		},
 		data() {
 			return {
-				pagesize:8,
-				currpage:1,
+				pagesize: 8,
+				currpage: 1,
+				isTab:true,
 				iSfalse: false,
 				nullTrue: false,
-				options: [{
-					value: '选项1',
-					label: '黄金糕'
-				}, {
-					value: '选项2',
-					label: '双皮奶'
-				}, {
-					value: '选项3',
-					label: '蚵仔煎'
-				}, {
-					value: '选项4',
-					label: '龙须面'
-				}, {
-					value: '选项5',
-					label: '北京烤鸭'
-				}],
+				options: [],
 				value: '',
-				tableData: [{
-					name: '王小虎',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎5',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎4',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎3',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎2',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}, {
-					name: '王小虎1',
-					idCard: '1306821989********',
-					phone: '15653223333',
-					yuoxiao: '2019/10/16-2019/10/20',
-					describe: '可拨打3次，每次拨打时长30分钟'
-
-				}]
+				tableData: [],
+				url: this.URL.url,
+				PhoneNum: 0,
+				DialedNum: 0,
+				SurplusNum: 0,
+				NoNum: 0,
+				optionsName:'',
 			}
 		},
-		methods:{
-			handleSizeChange(val){
+		mounted() {
+			this.$axios({
+				method: 'post',
+				url: this.url + '/api/Missingrepair/PhoneCollectPullDownLists',
+			}).then((res) => {
+				this.options = res.data.data
+			})
+			this.deailAjax()
+		},
+		methods: {
+			chChange(val) {
+				var obj = {};
+				obj = this.options.find(item => {
+					return item.id === val
+				});
+				this.optionsName = obj.TelephoneCollectiveName
+			},
+			handleSizeChange(val) {
 				// console.log('每页+"val"+条')
 				this.pagesize = val
 			},
-			handleCurrentChange(val){
+			handleCurrentChange(val) {
 				// console.log('当前页'+ val)
 				this.currpage = val
+			},
+			deailAjax() {
+				this.$axios({
+					method: 'post',
+					url: this.url + '/api/Missingrepair/PhoneCollectDetail',
+					data: {
+						CollectId: this.$route.query.id
+					},
+					
+				}).then((res) => {
+					if (res.data.code == 200) {
+						this.tableData = res.data.data
+						this.PhoneNum = res.data.PhoneNum
+						this.DialedNum = res.data.DialedNum
+						this.SurplusNum = res.data.SurplusNum
+						this.NoNum = res.data.NoNum
+					}
+				})
+			},
+			go() {
+				
+				this.$axios({
+					method: 'post',
+					url: this.url + '/api/Missingrepair/PhoneCollectDetail',
+					data: {
+						CollectId: this.value
+					},
+				}).then((res) =>{
+					if(res.data.code == 200){
+						this.tableData = res.data.data
+						this.PhoneNum = res.data.PhoneNum
+						this.DialedNum =  res.data.DialedNum
+						this.SurplusNum = res.data.SurplusNum
+						this.NoNum = res.data.NoNum
+						this.isTab = true
+						this.nullTrue = false
+					}else if(res.data.code == 202){
+						this.isTab = false
+						this.nullTrue = true
+						this.PhoneNum = 0
+						this.DialedNum =  0
+						this.SurplusNum = 0
+						this.NoNum = 0
+					}
+				})
 			}
 		}
 	}
 </script>
 <style>
-	.el-table tr:nth-child(even){
-		background: #F4F6FA;;
+	.el-table tr:nth-child(even) {
+		background: #F4F6FA;
+	}
+
+	.el-input__icon {
+		line-height: 35px !important;
 	}
 </style>
